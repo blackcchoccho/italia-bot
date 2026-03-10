@@ -112,42 +112,57 @@ def send_message(chat_id: int, text: str) -> bool:
 # ─── 메시지 빌더 ──────────────────────────────────────────────────────────────
 
 def build_morning_message(phrase: dict, dday: str) -> str:
-    """오전 6시 - 새 표현 메시지"""
-    return (
-        f"🇮🇹 <b>이탈리아 여행 회화</b>  |  9월 출발 <b>{dday}</b>\n"
-        f"━━━━━━━━━━━━━━━━━━━━━\n"
-        f"📖 <b>오늘의 표현 #{phrase['no']}/150</b>\n"
-        f"📍 {phrase['category']}\n"
-        f"💬 상황: {phrase['situation']}\n"
-        f"\n"
-        f"🇬🇧 <i>{phrase['en']}</i>\n"
-        f"🇮🇹 <b>{phrase['it']}</b>\n"
-        f"🔊 {phrase['pron']}\n"
-        f"\n"
-        f"{phrase['tip']}\n"
-        f"━━━━━━━━━━━━━━━━━━━━━\n"
-        f"낮 1시·저녁 8시에 다시 복습해요 📚"
-    )
+    """오전 5시 30분 - 새 표현 메시지"""
+    lines = []
+    lines.append(f"🇮🇹 <b>이탈리아 여행 회화</b>  |  9월 출발 <b>{dday}</b>")
+    lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"📖 <b>오늘의 표현 #{phrase['no']}/150</b>")
+    lines.append(f"📍 {phrase['category']}")
+    lines.append(f"💬 상황: {phrase['situation']}")
+
+    # 심사관/상대방 질문이 있는 경우 표시
+    if phrase.get("q"):
+        lines.append(f"\n❓ <b>상대방:</b> <i>{phrase['q']}</i>")
+
+    lines.append(f"\n⚡ <b>짧게 (실전):</b>")
+    lines.append(f"🇬🇧 {phrase['short_en']}")
+    lines.append(f"🇮🇹 {phrase['short_it']}")
+
+    lines.append(f"\n📚 <b>풀 문장 (정중하게):</b>")
+    lines.append(f"🇬🇧 <i>{phrase['en']}</i>")
+    lines.append(f"🇮🇹 <b>{phrase['it']}</b>")
+    lines.append(f"🔊 {phrase['pron']}")
+
+    lines.append(f"\n{phrase['tip']}")
+    lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"낮 1시·저녁 8시에 다시 복습해요 📚")
+
+    return "\n".join(lines)
 
 
 def build_reminder_message(phrase: dict, session: str) -> str:
     """낮 1시 / 저녁 8시 - 리마인드 메시지"""
     emoji = "🌞" if session == "afternoon" else "🌙"
     label = "점심 복습" if session == "afternoon" else "저녁 복습"
-    return (
-        f"{emoji} <b>{label}</b> | 표현 #{phrase['no']}/150\n"
-        f"━━━━━━━━━━━━━━━━━━━━━\n"
-        f"📍 {phrase['category']}\n"
-        f"💬 {phrase['situation']}\n"
-        f"\n"
-        f"🇬🇧 <i>{phrase['en']}</i>\n"
-        f"🇮🇹 <b>{phrase['it']}</b>\n"
-        f"🔊 {phrase['pron']}\n"
-        f"\n"
-        f"{phrase['tip']}\n"
-        f"━━━━━━━━━━━━━━━━━━━━━\n"
-        f"오늘 이 표현, 꼭 외워서 이탈리아에서 써먹어요! 💪"
-    )
+
+    lines = []
+    lines.append(f"{emoji} <b>{label}</b> | 표현 #{phrase['no']}/150")
+    lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"📍 {phrase['category']}")
+    lines.append(f"💬 {phrase['situation']}")
+
+    if phrase.get("q"):
+        lines.append(f"\n❓ <b>상대방:</b> <i>{phrase['q']}</i>")
+
+    lines.append(f"\n⚡ <b>짧게:</b> {phrase['short_en']}  /  {phrase['short_it']}")
+    lines.append(f"\n🇬🇧 <i>{phrase['en']}</i>")
+    lines.append(f"🇮🇹 <b>{phrase['it']}</b>")
+    lines.append(f"🔊 {phrase['pron']}")
+    lines.append(f"\n{phrase['tip']}")
+    lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"오늘 이 표현, 꼭 외워서 이탈리아에서 써먹어요! 💪")
+
+    return "\n".join(lines)
 
 
 # ─── 메인 ─────────────────────────────────────────────────────────────────────
