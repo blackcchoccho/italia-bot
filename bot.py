@@ -23,7 +23,7 @@ DEPARTURE_YEAR = int(os.environ.get("DEPARTURE_YEAR", "2026"))
 DEPARTURE_DATE = date(DEPARTURE_YEAR, 9, 1)
 
 # 표현 순환 시작일 (봇 가동 첫날 = 2026-03-09)
-START_DATE = date(2026, 3, 9)
+START_DATE = date(2026, 3, 10)
 
 KST = pytz.timezone("Asia/Seoul")
 
