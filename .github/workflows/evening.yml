@@ -1,0 +1,31 @@
+name: "🌙 이탈리아 회화 - 저녁 8시 (리마인드)"
+
+on:
+  schedule:
+    # 매일 저녁 8시 KST = 11:00 UTC
+    - cron: "0 11 * * *"
+  workflow_dispatch:   # 수동 실행 버튼 (테스트용)
+
+jobs:
+  send-evening:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 3.11 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 의존성 설치
+        run: pip install requests pytz
+
+      - name: 🌙 저녁 리마인드 전송
+        run: python bot.py evening
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID:   ${{ secrets.CHAT_ID }}
+          DEPARTURE_YEAR: "2026"
