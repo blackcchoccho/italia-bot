@@ -123,15 +123,17 @@ def build_morning_message(phrase: dict, dday: str) -> str:
     # 심사관/상대방 질문이 있는 경우 표시
     if phrase.get("q"):
         lines.append(f"\n❓ <b>상대방:</b> <i>{phrase['q']}</i>")
+        if phrase.get("q_pron"):
+            lines.append(f"   🔊 {phrase['q_pron']}")
 
     lines.append(f"\n⚡ <b>짧게 (실전):</b>")
     lines.append(f"🇬🇧 {phrase['short_en']}")
     lines.append(f"🇮🇹 {phrase['short_it']}")
-    lines.append(f"🔊 {phrase['pron']}")
 
     lines.append(f"\n📚 <b>풀 문장 (정중하게):</b>")
     lines.append(f"🇬🇧 <i>{phrase['en']}</i>")
     lines.append(f"🇮🇹 <b>{phrase['it']}</b>")
+    lines.append(f"🔊 {phrase['pron']}")
 
     lines.append(f"\n{phrase['tip']}")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
@@ -153,11 +155,13 @@ def build_reminder_message(phrase: dict, session: str) -> str:
 
     if phrase.get("q"):
         lines.append(f"\n❓ <b>상대방:</b> <i>{phrase['q']}</i>")
+        if phrase.get("q_pron"):
+            lines.append(f"   🔊 {phrase['q_pron']}")
 
     lines.append(f"\n⚡ <b>짧게:</b> {phrase['short_en']}  /  {phrase['short_it']}")
-    lines.append(f"🔊 {phrase['pron']}")
     lines.append(f"\n🇬🇧 <i>{phrase['en']}</i>")
     lines.append(f"🇮🇹 <b>{phrase['it']}</b>")
+    lines.append(f"🔊 {phrase['pron']}")
     lines.append(f"\n{phrase['tip']}")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
     lines.append(f"오늘 이 표현, 꼭 외워서 이탈리아에서 써먹어요! 💪")
