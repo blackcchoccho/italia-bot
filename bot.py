@@ -13,6 +13,7 @@ from datetime import date, datetime
 import pytz
 
 from phrases import PHRASES
+from ko_translations import KO, Q_KO
 
 # ─── 설정 ────────────────────────────────────────────────────────────────────
 BOT_TOKEN   = os.environ.get("BOT_TOKEN", "")
@@ -23,7 +24,7 @@ DEPARTURE_YEAR = int(os.environ.get("DEPARTURE_YEAR", "2026"))
 DEPARTURE_DATE = date(DEPARTURE_YEAR, 9, 1)
 
 # 표현 순환 시작일 (봇 가동 첫날 = 2026-03-09)
-START_DATE = date(2026, 3, 10)
+START_DATE = date(2026, 3, 12)
 
 KST = pytz.timezone("Asia/Seoul")
 
@@ -49,7 +50,7 @@ def get_dday() -> str:
         return f"D+{abs(delta)} ✈️ 여행 중!"
 
 
-def find_chat_id() -> int | None:
+def find_chat_id():
     """
     getUpdates를 통해 그룹 채팅 ID 자동 탐색.
     봇을 그룹에 추가하고 그룹에서 아무 메시지를 보낸 뒤 실행해야 작동합니다.
@@ -111,30 +112,32 @@ def send_message(chat_id: int, text: str) -> bool:
 
 # ─── 메시지 빌더 ──────────────────────────────────────────────────────────────
 
+def extract_q_en(q_raw: str) -> str:
+    """q 필드에서 영어 부분만 추출 (슬래시 이후 이탈리아어 제거)"""
+    return q_raw.split(" / ")[0].strip()
+
+
 def build_morning_message(phrase: dict, dday: str) -> str:
     """오전 5시 30분 - 새 표현 메시지"""
     lines = []
-    lines.append(f"🇮🇹 <b>이탈리아 여행 회화</b>  |  9월 출발 <b>{dday}</b>")
+    lines.append(f"🇮🇹 <b>{dday} | 이탈리아 여행 준비</b>")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
-    lines.append(f"📖 <b>오늘의 표현 #{phrase['no']}/150</b>")
-    lines.append(f"📍 {phrase['category']}")
-    lines.append(f"💬 상황: {phrase['situation']}")
+    lines.append(f"📖 오늘의 표현 #{phrase['no']}/150")
+    lines.append(f"📍 상황: {phrase['situation']}")
 
-    # 심사관/상대방 질문이 있는 경우 표시
     if phrase.get("q"):
-        lines.append(f"\n❓ <b>상대방:</b> <i>{phrase['q']}</i>")
-        if phrase.get("q_pron"):
-            lines.append(f"   🔊 {phrase['q_pron']}")
+        q_en = extract_q_en(phrase["q"])
+        q_ko = Q_KO.get(phrase["no"], "")
+        partner_line = f"👤 <b>Partner:</b> {q_en}"
+        if q_ko:
+            partner_line += f" / {q_ko}"
+        lines.append(f"\n{partner_line}")
 
-    lines.append(f"\n⚡ <b>짧게 (실전):</b>")
-    lines.append(f"🇬🇧 {phrase['short_en']}")
-    lines.append(f"🇮🇹 {phrase['short_it']}")
-
-    lines.append(f"\n📚 <b>풀 문장 (정중하게):</b>")
-    lines.append(f"🇬🇧 <i>{phrase['en']}</i>")
-    lines.append(f"🇮🇹 <b>{phrase['it']}</b>")
-    lines.append(f"🔊 {phrase['pron']}")
-
+    lines.append(f"\n🇺🇸 <b>Formal:</b> {phrase['en']}")
+    lines.append(f"🗣️ <b>Real Life:</b> {phrase['short_en']}")
+    ko = KO.get(phrase['no'])
+    if ko:
+        lines.append(f"🇰🇷 <b>한글:</b> {ko}")
     lines.append(f"\n{phrase['tip']}")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
     lines.append(f"낮 1시·저녁 8시에 다시 복습해요 📚")
@@ -148,20 +151,23 @@ def build_reminder_message(phrase: dict, session: str) -> str:
     label = "점심 복습" if session == "afternoon" else "저녁 복습"
 
     lines = []
-    lines.append(f"{emoji} <b>{label}</b> | 표현 #{phrase['no']}/150")
+    lines.append(f"{emoji} <b>{label} #{phrase['no']}/150</b>")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
-    lines.append(f"📍 {phrase['category']}")
-    lines.append(f"💬 {phrase['situation']}")
+    lines.append(f"📍 상황: {phrase['situation']}")
 
     if phrase.get("q"):
-        lines.append(f"\n❓ <b>상대방:</b> <i>{phrase['q']}</i>")
-        if phrase.get("q_pron"):
-            lines.append(f"   🔊 {phrase['q_pron']}")
+        q_en = extract_q_en(phrase["q"])
+        q_ko = Q_KO.get(phrase["no"], "")
+        partner_line = f"👤 <b>Partner:</b> {q_en}"
+        if q_ko:
+            partner_line += f" / {q_ko}"
+        lines.append(f"\n{partner_line}")
 
-    lines.append(f"\n⚡ <b>짧게:</b> {phrase['short_en']}  /  {phrase['short_it']}")
-    lines.append(f"\n🇬🇧 <i>{phrase['en']}</i>")
-    lines.append(f"🇮🇹 <b>{phrase['it']}</b>")
-    lines.append(f"🔊 {phrase['pron']}")
+    lines.append(f"\n🇺🇸 <b>Formal:</b> {phrase['en']}")
+    lines.append(f"🗣️ <b>Real Life:</b> {phrase['short_en']}")
+    ko = KO.get(phrase['no'])
+    if ko:
+        lines.append(f"🇰🇷 <b>한글:</b> {ko}")
     lines.append(f"\n{phrase['tip']}")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
     lines.append(f"오늘 이 표현, 꼭 외워서 이탈리아에서 써먹어요! 💪")
@@ -202,7 +208,7 @@ def main():
     dday   = get_dday()
 
     print(f"[INFO] 모드={mode} | 표현#{phrase['no']} | {dday}")
-    print(f"[INFO] 표현: {phrase['it']}")
+    print(f"[INFO] 표현: {phrase['en']}")
 
     # 채팅 ID 탐색
     chat_id = find_chat_id()
